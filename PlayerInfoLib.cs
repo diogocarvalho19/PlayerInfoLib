@@ -56,13 +56,13 @@ namespace PlayerInfoLibrary
             if (LoginTime.ContainsKey(player.CSteamID))
                 LoginTime.Remove(player.CSteamID);
             LoginTime.Add(player.CSteamID, DateTime.Now);
-            PlayerData pData = Database.QueryById(player.CSteamID, false);
-            int totalTime = pData.TotalPlayime;
-            DateTime loginTime = PlayerInfoLib.LoginTime[player.CSteamID];
+            var pData = Database.QueryById(player.CSteamID, false);
+            var totalTime = pData.TotalPlayTime;
+            var loginTime = LoginTime[player.CSteamID];
             pData = new PlayerData(player.CSteamID, player.SteamName, player.CharacterName, player.CSteamID.GetIP(), loginTime, Database.InstanceID, Provider.serverName, Database.InstanceID, loginTime, false, false, totalTime);
             Database.SaveToDB(pData);
             // Recheck the ip address in the component, the ip isn't always fully set by the time this event is called.
-            PlayerInfoLibPComponent pc = player.GetComponent<PlayerInfoLibPComponent>();
+            var pc = player.GetComponent<PlayerInfoLibPComponent>();
             pc.Start(pData);
         }
 
@@ -72,11 +72,10 @@ namespace PlayerInfoLibrary
             {
                 if (LoginTime.ContainsKey(player.CSteamID))
                 {
-                    PlayerData pData = Database.QueryById(player.CSteamID, false);
+                    var pData = Database.QueryById(player.CSteamID, false);
                     if (pData.IsValid() && pData.IsLocal())
                     {
-                        int totalSessionTime = (int)(DateTime.Now - LoginTime[player.CSteamID]).TotalSeconds;
-                        pData.TotalPlayime += totalSessionTime;
+                        pData.TotalPlayTime += (int)(DateTime.Now - LoginTime[player.CSteamID]).TotalSeconds;
                         Database.SaveToDB(pData);
                     }
                     LoginTime.Remove(player.CSteamID);

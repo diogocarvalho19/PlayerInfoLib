@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
 using System;
@@ -17,7 +18,7 @@ namespace PlayerInfoLibrary
             return (long)(datetime.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
         }
 
-        public static bool IsDBNull (this MySqlDataReader reader, string fieldname)
+        public static bool IsDBNull(this MySqlDataReader reader, string fieldname)
         {
             return reader.IsDBNull(reader.GetOrdinal(fieldname));
         }
@@ -25,21 +26,19 @@ namespace PlayerInfoLibrary
         public static string GetIP(this CSteamID cSteamID)
         {
             // Grab an active players ip address from CSteamID.
-            P2PSessionState_t sessionState;
-            SteamGameServerNetworking.GetP2PSessionState(cSteamID, out sessionState);
+            SteamGameServerNetworking.GetP2PSessionState(cSteamID, out var sessionState);
             return Parser.getIPFromUInt32(sessionState.m_nRemoteIP);
         }
 
         // Returns a Steamworks.CSteamID on out from a string, and returns true if it is a CSteamID.
-        public static bool isCSteamID(this string sCSteamID, out CSteamID cSteamID)
+        public static bool IsCSteamID(this string sCSteamID, out CSteamID cSteamID)
         {
-            ulong ulCSteamID;
-            cSteamID = (CSteamID)0;
-            if (ulong.TryParse(sCSteamID, out ulCSteamID))
+            cSteamID = CSteamID.Nil;
+            if (ulong.TryParse(sCSteamID, out var ulCSteamID))
             {
                 if ((ulCSteamID >= 0x0110000100000000 && ulCSteamID <= 0x0170000000000000) || ulCSteamID == 0)
                 {
-                    cSteamID = (CSteamID)ulCSteamID;
+                    cSteamID = new CSteamID(ulCSteamID);
                     return true;
                 }
             }
@@ -70,6 +69,30 @@ namespace PlayerInfoLibrary
             }
             totalTimeFormated += ((int)(totalTime % 60)).ToString() + "s";
             return totalTimeFormated;
+        }
+
+        public static int TotalPlayTime(this CSteamID PlayerID)
+        {
+            var RegistedTime = 0;
+            var Player = UnturnedPlayer.FromCSteamID(PlayerID);
+            if (Player != null)
+            {
+                var Component = Player.GetComponent<PlayerInfoLibPComponent>();
+                if (Component != null && Component.pData.IsValid() && Component.pData.IsLocal())
+                    RegistedTime = Component.pData.TotalPlayTime;
+            }
+
+            if (RegistedTime == 0)
+            {
+                var pData = PlayerInfoLib.Database.QueryById(PlayerID, false);
+                if (pData.IsValid() && pData.IsLocal())
+                    RegistedTime = pData.TotalPlayTime;
+            }
+
+            if (PlayerInfoLib.LoginTime.TryGetValue(PlayerID, out var Date))
+                RegistedTime += (int)(DateTime.Now - Date).TotalSeconds;
+            
+            return RegistedTime;
         }
     }
 }

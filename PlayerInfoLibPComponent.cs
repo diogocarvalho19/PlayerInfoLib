@@ -5,9 +5,9 @@ namespace PlayerInfoLibrary
 {
     public class PlayerInfoLibPComponent : UnturnedPlayerComponent
     {
+        public PlayerData pData { get; private set; }
         private bool start;
         private DateTime startTime;
-        private PlayerData pData;
         private float ping;
 
         protected override void Load()

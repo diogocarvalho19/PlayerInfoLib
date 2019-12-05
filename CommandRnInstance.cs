@@ -44,24 +44,18 @@ namespace PlayerInfoLibrary
             {
                 UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_help"));
             }
-            if (command.Length > 1)
+            else if (command.Length > 1)
             {
                 UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("too_many_parameters"));
                 return;
             }
-            if (command.Length == 1)
+            var newName = command[0].ToLower();
+            if (PlayerInfoLib.Database.SetInstanceName(newName))
             {
-                string newName = command[0].ToLower();
-                if (PlayerInfoLib.Database.SetInstanceName(newName))
-                {
-                    UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_success"));
-                    return;
-                }
-                else
-                {
-                    UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_not_found"));
-                }
+                UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_success"));
+                return;
             }
+            UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_not_found"));
         }
     }
 }

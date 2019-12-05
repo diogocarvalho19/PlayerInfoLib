@@ -10,14 +10,14 @@ namespace PlayerInfoLibrary
 {
     public class DatabaseManager
     {
-        private Dictionary<CSteamID, PlayerData> Cache = new Dictionary<CSteamID, PlayerData>();
+        private readonly Dictionary<CSteamID, PlayerData> Cache = new Dictionary<CSteamID, PlayerData>();
         public bool Initialized { get; private set; }
         private MySqlConnection Connection = null;
-        private int MaxRetry = 5;
-        private string Table;
-        private string TableConfig;
-        private string TableInstance;
-        private string TableServer;
+        private readonly int MaxRetry = 5;
+        private readonly string Table;
+        private readonly string TableConfig;
+        private readonly string TableInstance;
+        private readonly string TableServer;
         internal ushort InstanceID { get; private set; }
         public static readonly uint DatabaseSchemaVersion = 4;
         public static readonly uint DatabaseInterfaceVersion = 2;
@@ -332,7 +332,7 @@ namespace PlayerInfoLibrary
             else
             {
                 Logger.LogWarning(ex.Number.ToString() + ":" + ((MySqlErrorCode)ex.Number).ToString());
-                Logger.LogException(ex , msg != null ? msg : null);
+                Logger.LogException(ex , msg ?? null);
             }
             return false;
         }
@@ -410,7 +410,6 @@ namespace PlayerInfoLibrary
             List<PlayerData> playerList = new List<PlayerData>();
             MySqlDataReader reader = null;
             totalRecods = 0;
-            uint limitStart = (page - 1) * limit;
             MySqlCommand command = Connection.CreateCommand();
             try
             {
@@ -767,7 +766,7 @@ namespace PlayerInfoLibrary
                 command.Parameters.AddWithValue("@instanceid", pdata.ServerID);
                 command.Parameters.AddWithValue("@lastinstanceid", pdata.LastServerID);
                 command.Parameters.AddWithValue("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp());
-                command.Parameters.AddWithValue("@totalplaytime", pdata.TotalPlayime);
+                command.Parameters.AddWithValue("@totalplaytime", pdata.TotalPlayTime);
                 command.Parameters.AddWithValue("@lastloginlocal", pdata.LastLoginLocal.ToTimeStamp());
                 command.Parameters.AddWithValue("@cleanedbuildables", pdata.CleanedBuildables);
                 command.Parameters.AddWithValue("@cleanedplayerdata", pdata.CleanedPlayerData);
