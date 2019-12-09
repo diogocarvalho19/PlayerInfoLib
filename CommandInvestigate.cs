@@ -2,10 +2,10 @@ using Rocket.API;
 using Rocket.API.Extensions;
 using Rocket.Unturned.Chat;
 using SDG.Unturned;
-using Steamworks;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Math = System.Math;
+
 
 namespace PlayerInfoLibrary
 {
