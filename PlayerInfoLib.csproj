@@ -47,6 +47,7 @@
     <Reference Include="Google.Protobuf, Version=3.11.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Google.Protobuf.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="I18N">
       <HintPath>Libraries\I18N.dll</HintPath>
