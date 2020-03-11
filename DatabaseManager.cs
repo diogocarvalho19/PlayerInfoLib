@@ -5,6 +5,7 @@ using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace PlayerInfoLibrary
 {
@@ -199,8 +200,18 @@ namespace PlayerInfoLibrary
             }
             return false;
         }
-
-        private void CheckVersion(ushort version, MySqlCommand command)
+        public void CheckVersion(ushort version, MySqlCommand command)
+        {
+            try
+            {
+                ThreadPool.QueueUserWorkItem(yes => CheckVersionThread(version, command));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+        private void CheckVersionThread(ushort version, MySqlCommand command)
         {
             ushort updatingVersion = 0;
             try
@@ -543,6 +554,17 @@ namespace PlayerInfoLibrary
 
         public void SetOption(CSteamID SteamID, OptionType optionType, bool setValue)
         {
+            try
+            {
+                ThreadPool.QueueUserWorkItem(yes => SetOptionThread(SteamID, optionType, setValue));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+        private void SetOptionThread(CSteamID SteamID, OptionType optionType, bool setValue)
+        {
             if (!Initialized)
             {
                 Logger.LogError("Error: Cant load player info from DB, plugin hasn't initialized properly.");
@@ -598,7 +620,7 @@ namespace PlayerInfoLibrary
             }
         }
 
-        internal bool RemoveInstance(ushort InstanceId)
+        public bool RemoveInstance(ushort InstanceId)
         {
             if (!Initialized)
             {
@@ -653,7 +675,18 @@ namespace PlayerInfoLibrary
             return true;
         }
 
-        internal void PrecessExpiredPInfo()
+        public void PrecessExpiredPInfo()
+        {
+            try
+            {
+                ThreadPool.QueueUserWorkItem(yes => PrecessExpiredPInfoThread());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+        private void PrecessExpiredPInfoThread()
         {
             if (Initialized)
             {
@@ -695,8 +728,18 @@ namespace PlayerInfoLibrary
                 }
             }
         }
-
-        private void ProcessRecordRemoval(MySqlCommand command, Dictionary<ulong, object[]> records, ushort InstanceId, bool InstanceRemoval = true)
+        public void ProcessRecordRemoval(MySqlCommand command, Dictionary<ulong, object[]> records, ushort InstanceId, bool InstanceRemoval = true)
+        {
+            try
+            {
+                ThreadPool.QueueUserWorkItem(yes => ProcessRecordRemovalThread(command, records, InstanceId, InstanceRemoval));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+        private void ProcessRecordRemovalThread(MySqlCommand command, Dictionary<ulong, object[]> records, ushort InstanceId, bool InstanceRemoval = true)
         {
             try
             {
@@ -744,7 +787,18 @@ namespace PlayerInfoLibrary
         }
 
         // Data Saving section.
-        internal void SaveToDB(PlayerData pdata, bool retry = false)
+        public void SaveToDB(PlayerData pdata, bool retry = false)
+        {
+            try
+            {
+                ThreadPool.QueueUserWorkItem(yes => SaveToDBThread(pdata, retry));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+        private void SaveToDBThread(PlayerData pdata, bool retry = false)
         {
             try
             {

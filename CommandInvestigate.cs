@@ -15,7 +15,7 @@ namespace PlayerInfoLibrary
         internal static readonly string help = "Returns info for players matching the search quarry.";
         public List<string> Aliases
         {
-            get { return new List<string>(); }
+            get { return new List<string> { "inv" }; }
         }
 
         public AllowedCaller AllowedCaller
