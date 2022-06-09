@@ -25,9 +25,9 @@ namespace PlayerInfoLibrary
 
         public static string GetIP(this CSteamID cSteamID)
         {
-            // Grab an active players ip address from CSteamID.
-            SteamGameServerNetworking.GetP2PSessionState(cSteamID, out var sessionState);
-            return Parser.getIPFromUInt32(sessionState.m_nRemoteIP);
+            var player = UnturnedPlayer.FromCSteamID(cSteamID);
+            var IP = player.Player.channel.owner.getIPv4AddressOrZero();
+            return Parser.getIPFromUInt32(IP);
         }
 
         // Returns a Steamworks.CSteamID on out from a string, and returns true if it is a CSteamID.
